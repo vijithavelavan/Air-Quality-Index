@@ -213,25 +213,69 @@ elif menu == "📈 7-Day Forecast":
     st.markdown('<div class="sub-title">Autoregressive machine learning time-series projections avoiding lookahead bias.</div>', unsafe_allow_html=True)
 
     selected_city = st.selectbox("Select Target City", ["Delhi", "Mumbai", "Bengaluru", "Kolkata", "Hyderabad", "Chennai"])
-    if st.button("Generate 7-Day City Forecast"):
+    if st.button("Generate 7-Day City Forecast", use_container_width=True):
         with st.spinner(f"Simulating time-series model for {selected_city}..."):
             fc_data = train_and_forecast_city(selected_city)
-            if "error" in fc_data:
-                st.error(fc_data["error"])
+            if not fc_data or "error" in fc_data or not fc_data.get("success", False):
+                st.error(fc_data.get("error", "Failed to generate forecast for this city."))
             else:
-                forecast_list = fc_data.get("forecast", [])
-                st.success(f"Forecast successfully computed for {selected_city}!")
-
-                fc_df = pd.DataFrame(forecast_list)
-                fc_df = fc_df.rename(columns={"predicted_aqi": "Forecasted AQI"})
+                forecast_list = fc_data.get("forecasts") or fc_data.get("forecast") or []
+                recent_history = fc_data.get("recent_history", [])
                 
-                # Chart
-                chart_data = fc_df[["date", "Forecasted AQI"]].set_index("date")
-                st.line_chart(chart_data)
+                if not forecast_list:
+                    st.warning("No forecast points could be generated.")
+                else:
+                    st.success(f"Forecast successfully computed for {selected_city}!")
 
-                # Cards
-                st.markdown("#### Day-by-Day Forecast Details")
-                st.dataframe(fc_df[["date", "Forecasted AQI", "category", "confidence"]], use_container_width=True)
+                    # Summary Metrics
+                    fc_col1, fc_col2, fc_col3 = st.columns(3)
+                    with fc_col1:
+                        st.metric("Last Observation", fc_data.get("last_observed_date", "Recent"))
+                    with fc_col2:
+                        st.metric("Validation MAE", f"{fc_data.get('validation_mae', 0):.2f}")
+                    with fc_col3:
+                        st.metric("Validation RMSE", f"{fc_data.get('validation_rmse', 0):.2f}")
+
+                    # Build combined timeline dataframe for charting
+                    timeline_records = []
+                    for h in recent_history:
+                        timeline_records.append({
+                            "Date": h.get("date"),
+                            "Observed AQI": round(float(h.get("aqi", 0)), 1),
+                            "Forecasted AQI": None
+                        })
+                    
+                    # Connect the last history point to the forecast line for smooth visual transition
+                    if timeline_records:
+                        timeline_records[-1]["Forecasted AQI"] = timeline_records[-1]["Observed AQI"]
+
+                    for f in forecast_list:
+                        timeline_records.append({
+                            "Date": f.get("date"),
+                            "Observed AQI": None,
+                            "Forecasted AQI": round(float(f.get("predicted_aqi", 0)), 1)
+                        })
+
+                    chart_df = pd.DataFrame(timeline_records).set_index("Date")
+                    st.markdown("#### AQI Trend: Historical Observations & 7-Day Projection")
+                    st.line_chart(chart_df)
+
+                    # Detailed Day-by-Day Forecast Table
+                    st.markdown("#### Day-by-Day Projections & Health Warnings")
+                    table_rows = []
+                    for f in forecast_list:
+                        table_rows.append({
+                            "Day": f"Day {f.get('day')}",
+                            "Date": f.get("date"),
+                            "Forecasted AQI": f.get("predicted_aqi"),
+                            "95% CI Range": f"{f.get('ci_lower')} – {f.get('ci_upper')}",
+                            "Category": f.get("category"),
+                            "Health Advisory": f.get("health_risk")
+                        })
+                    st.dataframe(pd.DataFrame(table_rows), use_container_width=True)
+
+                    if fc_data.get("limitations"):
+                        st.caption(f"ℹ️ **Note**: {fc_data.get('limitations')}")
 
 
 # ---------------- PAGE 4: MODEL EVALUATION ----------------
