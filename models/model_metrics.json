@@ -1,0 +1,394 @@
+{
+  "model_name": "Random Forest Regressor",
+  "n_estimators": 120,
+  "test_mae": 1.785,
+  "test_rmse": 5.179,
+  "test_r2": 0.9964,
+  "train_mae": 0.82,
+  "train_r2": 0.9988,
+  "total_samples": 1500,
+  "train_samples": 1200,
+  "test_samples": 300,
+  "features": [
+    "PM2.5",
+    "PM10",
+    "NO2",
+    "SO2",
+    "CO",
+    "O3",
+    "NH3"
+  ],
+  "feature_importances": {
+    "PM2.5": 0.9526,
+    "PM10": 0.0152,
+    "NO2": 0.0047,
+    "SO2": 0.0001,
+    "CO": 0.0265,
+    "O3": 0.0007,
+    "NH3": 0.0001
+  },
+  "actual_vs_predicted": [
+    {
+      "sample_id": 53,
+      "actual": 24.0,
+      "predicted": 32.2,
+      "error": 8.2
+    },
+    {
+      "sample_id": 150,
+      "actual": 43.0,
+      "predicted": 44.0,
+      "error": 1.0
+    },
+    {
+      "sample_id": 293,
+      "actual": 45.0,
+      "predicted": 42.1,
+      "error": 2.9
+    },
+    {
+      "sample_id": 261,
+      "actual": 54.0,
+      "predicted": 55.2,
+      "error": 1.2
+    },
+    {
+      "sample_id": 32,
+      "actual": 57.0,
+      "predicted": 57.5,
+      "error": 0.5
+    },
+    {
+      "sample_id": 258,
+      "actual": 60.0,
+      "predicted": 60.0,
+      "error": 0.0
+    },
+    {
+      "sample_id": 130,
+      "actual": 61.0,
+      "predicted": 60.9,
+      "error": 0.1
+    },
+    {
+      "sample_id": 255,
+      "actual": 65.0,
+      "predicted": 65.0,
+      "error": 0.0
+    },
+    {
+      "sample_id": 165,
+      "actual": 67.0,
+      "predicted": 68.7,
+      "error": 1.7
+    },
+    {
+      "sample_id": 157,
+      "actual": 69.0,
+      "predicted": 64.8,
+      "error": 4.2
+    },
+    {
+      "sample_id": 52,
+      "actual": 76.0,
+      "predicted": 76.7,
+      "error": 0.7
+    },
+    {
+      "sample_id": 189,
+      "actual": 77.0,
+      "predicted": 77.2,
+      "error": 0.2
+    },
+    {
+      "sample_id": 125,
+      "actual": 81.0,
+      "predicted": 80.6,
+      "error": 0.4
+    },
+    {
+      "sample_id": 132,
+      "actual": 81.0,
+      "predicted": 77.6,
+      "error": 3.4
+    },
+    {
+      "sample_id": 231,
+      "actual": 87.0,
+      "predicted": 87.0,
+      "error": 0.0
+    },
+    {
+      "sample_id": 250,
+      "actual": 91.0,
+      "predicted": 90.9,
+      "error": 0.1
+    },
+    {
+      "sample_id": 59,
+      "actual": 97.0,
+      "predicted": 96.5,
+      "error": 0.5
+    },
+    {
+      "sample_id": 103,
+      "actual": 99.0,
+      "predicted": 90.1,
+      "error": 8.9
+    },
+    {
+      "sample_id": 237,
+      "actual": 102.0,
+      "predicted": 102.0,
+      "error": 0.0
+    },
+    {
+      "sample_id": 151,
+      "actual": 102.0,
+      "predicted": 102.0,
+      "error": 0.0
+    },
+    {
+      "sample_id": 286,
+      "actual": 104.0,
+      "predicted": 104.1,
+      "error": 0.1
+    },
+    {
+      "sample_id": 69,
+      "actual": 104.0,
+      "predicted": 103.9,
+      "error": 0.1
+    },
+    {
+      "sample_id": 171,
+      "actual": 105.0,
+      "predicted": 104.8,
+      "error": 0.2
+    },
+    {
+      "sample_id": 195,
+      "actual": 112.0,
+      "predicted": 112.4,
+      "error": 0.4
+    },
+    {
+      "sample_id": 129,
+      "actual": 114.0,
+      "predicted": 114.5,
+      "error": 0.5
+    },
+    {
+      "sample_id": 197,
+      "actual": 114.0,
+      "predicted": 111.5,
+      "error": 2.5
+    },
+    {
+      "sample_id": 253,
+      "actual": 115.0,
+      "predicted": 115.1,
+      "error": 0.1
+    },
+    {
+      "sample_id": 9,
+      "actual": 116.0,
+      "predicted": 116.1,
+      "error": 0.1
+    },
+    {
+      "sample_id": 285,
+      "actual": 125.0,
+      "predicted": 125.6,
+      "error": 0.6
+    },
+    {
+      "sample_id": 144,
+      "actual": 125.0,
+      "predicted": 125.4,
+      "error": 0.4
+    },
+    {
+      "sample_id": 277,
+      "actual": 127.0,
+      "predicted": 127.2,
+      "error": 0.2
+    },
+    {
+      "sample_id": 106,
+      "actual": 132.0,
+      "predicted": 116.3,
+      "error": 15.7
+    },
+    {
+      "sample_id": 214,
+      "actual": 139.0,
+      "predicted": 139.3,
+      "error": 0.3
+    },
+    {
+      "sample_id": 41,
+      "actual": 140.0,
+      "predicted": 140.0,
+      "error": 0.0
+    },
+    {
+      "sample_id": 248,
+      "actual": 146.0,
+      "predicted": 148.8,
+      "error": 2.8
+    },
+    {
+      "sample_id": 282,
+      "actual": 156.0,
+      "predicted": 156.6,
+      "error": 0.6
+    },
+    {
+      "sample_id": 22,
+      "actual": 159.0,
+      "predicted": 158.8,
+      "error": 0.2
+    },
+    {
+      "sample_id": 256,
+      "actual": 159.0,
+      "predicted": 158.7,
+      "error": 0.3
+    },
+    {
+      "sample_id": 207,
+      "actual": 159.0,
+      "predicted": 158.9,
+      "error": 0.1
+    },
+    {
+      "sample_id": 112,
+      "actual": 165.0,
+      "predicted": 113.7,
+      "error": 51.3
+    },
+    {
+      "sample_id": 265,
+      "actual": 168.0,
+      "predicted": 167.6,
+      "error": 0.4
+    },
+    {
+      "sample_id": 87,
+      "actual": 174.0,
+      "predicted": 143.5,
+      "error": 30.5
+    },
+    {
+      "sample_id": 142,
+      "actual": 182.0,
+      "predicted": 181.8,
+      "error": 0.2
+    },
+    {
+      "sample_id": 213,
+      "actual": 185.0,
+      "predicted": 185.6,
+      "error": 0.6
+    },
+    {
+      "sample_id": 20,
+      "actual": 206.0,
+      "predicted": 205.6,
+      "error": 0.4
+    },
+    {
+      "sample_id": 198,
+      "actual": 207.0,
+      "predicted": 207.0,
+      "error": 0.0
+    },
+    {
+      "sample_id": 270,
+      "actual": 232.0,
+      "predicted": 231.0,
+      "error": 1.0
+    },
+    {
+      "sample_id": 39,
+      "actual": 234.0,
+      "predicted": 233.8,
+      "error": 0.2
+    },
+    {
+      "sample_id": 33,
+      "actual": 234.0,
+      "predicted": 234.0,
+      "error": 0.0
+    },
+    {
+      "sample_id": 85,
+      "actual": 238.0,
+      "predicted": 238.6,
+      "error": 0.6
+    },
+    {
+      "sample_id": 55,
+      "actual": 239.0,
+      "predicted": 239.1,
+      "error": 0.1
+    },
+    {
+      "sample_id": 161,
+      "actual": 240.0,
+      "predicted": 239.7,
+      "error": 0.3
+    },
+    {
+      "sample_id": 50,
+      "actual": 271.0,
+      "predicted": 271.3,
+      "error": 0.3
+    },
+    {
+      "sample_id": 108,
+      "actual": 276.0,
+      "predicted": 275.2,
+      "error": 0.8
+    },
+    {
+      "sample_id": 146,
+      "actual": 288.0,
+      "predicted": 289.1,
+      "error": 1.1
+    },
+    {
+      "sample_id": 2,
+      "actual": 290.0,
+      "predicted": 290.0,
+      "error": 0.0
+    },
+    {
+      "sample_id": 288,
+      "actual": 303.0,
+      "predicted": 302.9,
+      "error": 0.1
+    },
+    {
+      "sample_id": 272,
+      "actual": 309.0,
+      "predicted": 309.2,
+      "error": 0.2
+    },
+    {
+      "sample_id": 294,
+      "actual": 321.0,
+      "predicted": 321.0,
+      "error": 0.0
+    },
+    {
+      "sample_id": 140,
+      "actual": 331.0,
+      "predicted": 330.7,
+      "error": 0.3
+    }
+  ],
+  "is_synthetic_dataset": true,
+  "dataset_note": "Trained on Synthetic Software-Testing Data"
+}
