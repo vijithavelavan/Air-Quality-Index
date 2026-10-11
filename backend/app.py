@@ -12,6 +12,7 @@ Endpoints:
 """
 
 import os
+import sys
 import io
 import json
 import pandas as pd
@@ -19,10 +20,23 @@ from flask import Flask, request, jsonify, redirect
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
-from backend.predict import predict_aqi, get_prediction_history, load_model_and_artifacts
-from backend.forecast import train_and_forecast_city
-from backend.preprocessing import inspect_dataset_summary, REQUIRED_FEATURES
-from backend.train_model import train_aqi_regressor
+# Ensure workspace root and backend directory are in sys.path
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PARENT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
+for p in (PARENT_DIR, CURRENT_DIR):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
+try:
+    from backend.predict import predict_aqi, get_prediction_history, load_model_and_artifacts, init_db
+    from backend.forecast import train_and_forecast_city
+    from backend.preprocessing import inspect_dataset_summary, REQUIRED_FEATURES
+    from backend.train_model import train_aqi_regressor
+except ImportError:
+    from predict import predict_aqi, get_prediction_history, load_model_and_artifacts, init_db
+    from forecast import train_and_forecast_city
+    from preprocessing import inspect_dataset_summary, REQUIRED_FEATURES
+    from train_model import train_aqi_regressor
 
 app = Flask(__name__)
 # Enable CORS for frontend Vite development server
@@ -276,7 +290,6 @@ def upload_dataset():
 
 if __name__ == '__main__':
     # Initialize SQLite and model upon launch
-    from backend.predict import init_db
     init_db()
     load_model_and_artifacts()
     app.run(host='127.0.0.1', port=5000, debug=False)

@@ -6,6 +6,7 @@ Calculates MAE, RMSE, R2, saves model artifacts, feature importances, and evalua
 """
 
 import os
+import sys
 import json
 import joblib
 import numpy as np
@@ -13,7 +14,19 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from backend.preprocessing import clean_air_quality_data, prepare_training_data, REQUIRED_FEATURES
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PARENT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
+for p in (PARENT_DIR, CURRENT_DIR):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
+try:
+    from backend.preprocessing import clean_air_quality_data, prepare_training_data, REQUIRED_FEATURES
+    from backend.cpcb_aqi import calculate_official_cpcb_aqi
+except ImportError:
+    from preprocessing import clean_air_quality_data, prepare_training_data, REQUIRED_FEATURES
+    from cpcb_aqi import calculate_official_cpcb_aqi
 
 MODELS_DIR = os.path.join(os.path.dirname(__file__), "..", "models")
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
@@ -53,7 +66,6 @@ def create_synthetic_testing_dataset(filepath: str, n_samples: int = 1500) -> pd
     })
     
     # Calculate initial AQI using sub-index principles
-    from backend.cpcb_aqi import calculate_official_cpcb_aqi
     aqis = []
     for _, row in df.iterrows():
         p_dict = {p: row[p] for p in REQUIRED_FEATURES}

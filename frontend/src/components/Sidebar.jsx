@@ -4,6 +4,7 @@ import {
   Sparkles, 
   TrendingUp, 
   BarChart3, 
+  Database,
   Info,
   Wind
 } from 'lucide-react';
@@ -14,6 +15,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     { id: 'predict', label: 'Predict AQI', icon: Sparkles },
     { id: 'forecast', label: '7-Day Forecast', icon: TrendingUp },
     { id: 'evaluation', label: 'Model Evaluation', icon: BarChart3 },
+    { id: 'dataset', label: 'Dataset & Upload', icon: Database },
     { id: 'standards', label: 'CPCB Standards', icon: Info },
   ];
 

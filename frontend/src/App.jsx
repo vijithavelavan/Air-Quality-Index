@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import PredictPage from './pages/PredictPage';
 import ForecastPage from './pages/ForecastPage';
 import ModelEvaluationPage from './pages/ModelEvaluationPage';
+import DatasetPage from './pages/DatasetPage';
 import StandardsPage from './pages/StandardsPage';
 
 export default function App() {
@@ -33,6 +34,8 @@ export default function App() {
         return <ForecastPage key={`forecast-${refreshTrigger}`} />;
       case 'evaluation':
         return <ModelEvaluationPage key={`eval-${refreshTrigger}`} />;
+      case 'dataset':
+        return <DatasetPage key={`dataset-${refreshTrigger}`} onModelRetrained={handlePredictionDone} />;
       case 'standards':
         return <StandardsPage />;
       default:

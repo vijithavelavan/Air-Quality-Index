@@ -6,14 +6,27 @@ Manages SQLite prediction history logging.
 """
 
 import os
+import sys
 import json
 import sqlite3
 import joblib
 import pandas as pd
 from datetime import datetime
 from typing import Dict, Any, Optional
-from backend.cpcb_aqi import calculate_official_cpcb_aqi, get_category_info
-from backend.preprocessing import REQUIRED_FEATURES
+
+# Ensure parent and current directory are in sys.path
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PARENT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
+for p in (PARENT_DIR, CURRENT_DIR):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
+try:
+    from backend.cpcb_aqi import calculate_official_cpcb_aqi, get_category_info
+    from backend.preprocessing import REQUIRED_FEATURES
+except ImportError:
+    from cpcb_aqi import calculate_official_cpcb_aqi, get_category_info
+    from preprocessing import REQUIRED_FEATURES
 
 MODELS_DIR = os.path.join(os.path.dirname(__file__), "..", "models")
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "prediction_history.sqlite")
@@ -52,7 +65,10 @@ def load_model_and_artifacts():
     
     if not os.path.exists(model_path):
         # Auto-train if not yet trained
-        from backend.train_model import train_aqi_regressor
+        try:
+            from backend.train_model import train_aqi_regressor
+        except ImportError:
+            from train_model import train_aqi_regressor
         train_aqi_regressor()
         
     model = joblib.load(model_path)
@@ -158,6 +174,11 @@ def predict_aqi(pollutant_inputs: Dict[str, Any]) -> Dict[str, Any]:
             "driving_pollutant": cpcb_res.get("driving_pollutant"),
             "sub_indices": cpcb_res.get("sub_indices")
         },
+        # Backward-compatible convenience aliases
+        "cpcb_category": cat_info,
+        "cpcb_official_aqi": cpcb_res.get("aqi"),
+        "driving_pollutant": cpcb_res.get("driving_pollutant"),
+        "pollutant_sub_indices": cpcb_res.get("sub_indices") or {},
         "inputs_used": processed_inputs,
         "timestamp": timestamp
     }

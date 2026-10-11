@@ -5,10 +5,21 @@ Works with Kaggle India air quality dataset (city_day.csv, station_day.csv) or u
 """
 
 import os
+import sys
 import pandas as pd
 import numpy as np
 from typing import Tuple, Dict, Any, List, Optional
-from backend.cpcb_aqi import calculate_official_cpcb_aqi
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PARENT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
+for p in (PARENT_DIR, CURRENT_DIR):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
+try:
+    from backend.cpcb_aqi import calculate_official_cpcb_aqi
+except ImportError:
+    from cpcb_aqi import calculate_official_cpcb_aqi
 
 REQUIRED_FEATURES = ['PM2.5', 'PM10', 'NO2', 'SO2', 'CO', 'O3', 'NH3']
 

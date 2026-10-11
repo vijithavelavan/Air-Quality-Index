@@ -7,6 +7,7 @@ Forecasts next 1 to 7 days for a selected city.
 """
 
 import os
+import sys
 import json
 import joblib
 import numpy as np
@@ -15,6 +16,19 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PARENT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
+for p in (PARENT_DIR, CURRENT_DIR):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
+try:
+    from backend.cpcb_aqi import get_category_info
+    from backend.preprocessing import clean_air_quality_data
+except ImportError:
+    from cpcb_aqi import get_category_info
+    from preprocessing import clean_air_quality_data
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 MODELS_DIR = os.path.join(os.path.dirname(__file__), "..", "models")
@@ -83,6 +97,7 @@ def train_and_forecast_city(city: str, days_ahead: int = 7) -> Dict[str, Any]:
             "error": "No dataset found. Please upload or place city_day.csv in the data directory."
         }
         
+    df = clean_air_quality_data(df)
     ts_data = prepare_city_time_series(df, city)
     if ts_data is None or len(ts_data) < 30:
         return {
@@ -124,8 +139,6 @@ def train_and_forecast_city(city: str, days_ahead: int = 7) -> Dict[str, Any]:
     
     forecasts = []
     current_date = last_known_date
-    
-    from backend.cpcb_aqi import get_category_info
     
     for day in range(1, days_ahead + 1):
         target_date = current_date + timedelta(days=day)

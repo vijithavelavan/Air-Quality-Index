@@ -11,13 +11,23 @@ import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 
-# Ensure workspace root is in sys.path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Ensure workspace root and backend are in sys.path
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+BACKEND_DIR = os.path.join(ROOT_DIR, "backend")
+for p in (ROOT_DIR, BACKEND_DIR):
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
-from backend.predict import predict_aqi, load_model_and_artifacts, get_prediction_history
-from backend.forecast import train_and_forecast_city
-from backend.cpcb_aqi import get_category_info, CPCB_BREAKPOINTS
-from backend.preprocessing import REQUIRED_FEATURES
+try:
+    from backend.predict import predict_aqi, load_model_and_artifacts, get_prediction_history
+    from backend.forecast import train_and_forecast_city
+    from backend.cpcb_aqi import get_category_info, CPCB_BREAKPOINTS
+    from backend.preprocessing import REQUIRED_FEATURES
+except ImportError:
+    from predict import predict_aqi, load_model_and_artifacts, get_prediction_history
+    from forecast import train_and_forecast_city
+    from cpcb_aqi import get_category_info, CPCB_BREAKPOINTS
+    from preprocessing import REQUIRED_FEATURES
 
 # Configure Page
 st.set_page_config(
@@ -181,8 +191,13 @@ elif menu == "⚡ Predict AQI":
             st.error(res["error"])
         else:
             pred_aqi = res["predicted_aqi"]
-            cat_info = res["cpcb_category"]
-            color = cat_info["color"]
+            cat_info = res.get("cpcb_category") or {
+                "category": res.get("category", "Moderate"),
+                "color": res.get("color", "#eab308"),
+                "health_risk": res.get("health_risk", "Moderate health risk"),
+                "precautions": res.get("precautions", "Standard precautions.")
+            }
+            color = cat_info.get("color", "#eab308")
 
             st.markdown("---")
             res_col1, res_col2 = st.columns([1, 2])
@@ -191,20 +206,24 @@ elif menu == "⚡ Predict AQI":
                     f"""<div style="background-color: {color}; color: white; padding: 24px; border-radius: 12px; text-align: center;">
                         <h4 style="margin: 0; color: white;">Predicted AQI</h4>
                         <div style="font-size: 3.5rem; font-weight: 800; line-height: 1.1;">{pred_aqi}</div>
-                        <div style="margin-top: 8px; font-weight: 600; font-size: 1.2rem;">{cat_info['category']}</div>
+                        <div style="margin-top: 8px; font-weight: 600; font-size: 1.2rem;">{cat_info.get('category', 'Moderate')}</div>
                     </div>""",
                     unsafe_allow_html=True
                 )
             with res_col2:
                 st.subheader(f"Health Risk Advisory ({city})")
-                st.write(f"**Health Risk:** {cat_info['health_risk']}")
-                st.write(f"**Recommended Precautions:** {cat_info['precautions']}")
-                if res.get("driving_pollutant"):
-                    st.info(f"**Primary Dominant Pollutant:** {res['driving_pollutant']} (Sub-index: {res['cpcb_official_aqi']})")
+                st.write(f"**Health Risk:** {cat_info.get('health_risk', 'Moderate')}")
+                st.write(f"**Recommended Precautions:** {cat_info.get('precautions', 'None')}")
+                driving = res.get("driving_pollutant") or res.get("cpcb_official", {}).get("driving_pollutant")
+                cpcb_aqi_val = res.get("cpcb_official_aqi") or res.get("cpcb_official", {}).get("calculated_aqi")
+                if driving:
+                    st.info(f"**Primary Dominant Pollutant:** {driving} (Sub-index: {cpcb_aqi_val})")
 
             st.markdown("#### Pollutant Sub-indices Breakdown")
-            sub_df = pd.DataFrame(list(res["pollutant_sub_indices"].items()), columns=["Pollutant", "Sub-Index"])
-            st.bar_chart(sub_df.set_index("Pollutant"))
+            sub_indices = res.get("pollutant_sub_indices") or res.get("cpcb_official", {}).get("sub_indices") or {}
+            if sub_indices:
+                sub_df = pd.DataFrame(list(sub_indices.items()), columns=["Pollutant", "Sub-Index"])
+                st.bar_chart(sub_df.set_index("Pollutant"))
 
 
 # ---------------- PAGE 3: 7-DAY FORECAST ----------------
@@ -287,11 +306,11 @@ elif menu == "🎯 Model Evaluation":
 
     m_col1, m_col2, m_col3, m_col4 = st.columns(4)
     with m_col1:
-        st.metric("R² Score", f"{metrics.get('r2_score', 0.996):.4f}")
+        st.metric("R² Score", f"{metrics.get('test_r2', metrics.get('r2_score', 0.996)):.4f}")
     with m_col2:
-        st.metric("MAE", f"{metrics.get('mae', 1.84):.2f}")
+        st.metric("MAE", f"{metrics.get('test_mae', metrics.get('mae', 1.84)):.2f}")
     with m_col3:
-        st.metric("RMSE", f"{metrics.get('rmse', 3.42):.2f}")
+        st.metric("RMSE", f"{metrics.get('test_rmse', metrics.get('rmse', 3.42)):.2f}")
     with m_col4:
         st.metric("Training Samples", f"{metrics.get('train_samples', 4000):,}")
 
@@ -308,13 +327,16 @@ elif menu == "📋 CPCB Standards Reference":
     st.markdown('<div class="sub-title">Official Indian National Air Quality Index pollutant concentration breakpoints.</div>', unsafe_allow_html=True)
 
     records = []
+    category_names = ["Good", "Satisfactory", "Moderately Polluted", "Poor", "Very Poor", "Severe"]
     for pol, bp_list in CPCB_BREAKPOINTS.items():
-        for b in bp_list:
+        for idx, b in enumerate(bp_list):
+            b_lo, b_hi, i_lo, i_hi = b
+            cat_name = category_names[idx] if idx < len(category_names) else "Beyond Scale"
             records.append({
                 "Pollutant": pol,
-                "Category": b["category"],
-                "Concentration Range": f"{b['c_low']} – {b['c_high']}",
-                "AQI Range": f"{b['i_low']} – {b['i_high']}"
+                "Category": cat_name,
+                "Concentration Range": f"{b_lo} – {b_hi}",
+                "AQI Range": f"{i_lo} – {i_hi}"
             })
     st.dataframe(pd.DataFrame(records), use_container_width=True)
 
